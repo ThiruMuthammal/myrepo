@@ -1,0 +1,183 @@
+// db.empDetails.insert(
+// ... {
+// ... First_Name: "Radhika",
+// ... Last_Name: "Sharma",
+// ... Age: "26",
+// ... e_mail: "radhika_sharma.123@gmail.com",
+// ... phone: "9000012345"
+// ... });
+
+
+// db.empDetails.count({
+// ...     "First_Name": "Radhika"
+// ... })
+
+
+
+/**
+ * $group
+ *  group single fields
+ */
+
+var pipeline = [
+    {$group: {_id:"$productName"}}
+];
+db.products.aggregate(pipeline).pretty();
+
+
+
+/**
+ * $group
+ * group multiple fields fields
+ */
+var pipeline = [
+    {$group: {_id: {productName: "$productName", productid: "$productid"}}}
+];
+db.products.aggregate(pipeline).pretty();
+
+
+
+/**
+ * $match and $group
+ */
+
+ var pipeline = [
+     {$match: {active: true}},
+    {$group: {_id: {productName: "$productName", productid: "$productid"}}}
+];
+db.products.aggregate(pipeline).pretty();
+
+
+
+/**
+ * swap $match and $group
+ * 
+ * didn't get o/p
+ */
+
+ var pipeline = [
+    
+   {$group: {_id: {productName: "$productName", productid: "$productid"}}},
+   {$match: {active: true}}
+];
+db.products.aggregate(pipeline).pretty();
+
+
+/**
+ * $group $match and 
+ * 
+ */
+
+ var pipeline = [
+    
+    {$group: {_id: {productName: "$productName", productid: "$productid", price: "$price"}}},
+    {$match:{"_id.price": 70000}}
+ ];
+ db.products.aggregate(pipeline).pretty();
+
+
+ /**
+  * $count syntax
+  * {$count <title>}
+  * count number of input documents
+  * 
+  * types of count method
+  * 
+  * 1. db.collection.aggtegate([]).toArray().length  --> clinte side count
+  * 2. db.collection.aggtegate([]).itcount  --> clinte side count
+  * 1. db.collection.aggtegate([$count:"total"]) --> server side count
+  * 
+  * db.collection.find().count() --> find count is wrapper of the aggregate count --> server side count
+  * 
+  */
+
+ /**
+  * $group and $count
+  */
+
+  var pipeline = [
+    
+    {$group: {_id: "$Model"}},
+    {$count: "Model"}
+ ];
+ db.products.aggregate(pipeline).pretty();
+
+
+  /**
+  * $sort stage
+  * sorts input documents by certain fields
+  * -1 --> desending order  1 --> assending order
+  */
+
+   var pipeline = [
+    
+    {$sort: {productName: -1, price: -1, productid: 1}}
+ ];
+ db.products.aggregate(pipeline).pretty();
+
+
+   /**
+  * $group and $sort
+  */
+
+    var pipeline = [
+    
+        {$group:{_id: {price:"$price", productName:"$productName"}}},
+        {$sort: {_id: 1}}
+     ];
+     db.products.aggregate(pipeline).pretty();
+    
+
+     var pipeline = [
+    
+        {$group:{_id: {price:"$price", productName:"$productName"}}},
+        {$sort: {"_id.price": 1, "_id.productName":-1}}
+     ];
+     db.products.aggregate(pipeline).pretty();
+
+
+     /**
+      * $project 
+      * includes, excludes or add new fields
+      * syntax
+      * {$project: {<field1>:<1>,<field1>:<0>, <newfield>:<expression>}}
+      */
+
+      var pipeline = [
+    
+        {$project: {_id:0, price:1 , productName:1}}
+     ];
+     db.products.aggregate(pipeline).pretty();
+
+     /**
+      * project with new fields
+      */
+
+      var pipeline = [
+    
+        {$project: {_id:0, index:1 , Phonenumber:1}}
+     ];
+     db.products.aggregate(pipeline).pretty();
+
+     
+     /**
+      * $limit
+      * outputs first n documents from the inputs
+      * 
+      * sampled aggregation requests with $limit as first stage
+      * after $sort to produce topN reslts
+      */
+
+      var pipeline = [
+    
+        {$project: {_id:0, index:1 , Phonenumber:1}}
+     ];
+     db.products.aggregate(pipeline).pretty();
+
+
+     /**
+      * $unwind
+      * splits each document with specified array to several documents
+      * 
+      * one document per array element
+      */
